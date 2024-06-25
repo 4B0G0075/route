@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+
+{% block title %}
+blockchain_explorer page
+{% endblock %}
+
+{% block content %}
+<style>
+/*區塊鏈儲存查詢界面 (blockchain_explorer.html)
+功能描述: 提供界面查詢區塊鏈上的攻擊存證信息，並支持追蹤攻擊來源。利用區塊鏈的特性，為用戶提供可靠和透明的數據存證服務。
+*/
+    /* CSS樣式 */
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #ffffff;
+        color: #000000;
+        margin: 0;
+        padding: 0;
+    }
+
+    header {
+        background-color: #008000;
+        padding: 20px;
+        text-align: center;
+        border-bottom: 2px solid #ffffff;
+    }
+
+    header h1 {
+        margin: 0;
+        font-size: 2.5em;
+        color: #ffffff;
+    }
+
+    form {
+        margin-bottom: 20px;
+    }
+
+    form label {
+        margin-right: 10px;
+    }
+
+    main {
+        padding: 20px;
+    }
+
+    .folder {
+        border: 1px solid #008000;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        overflow: hidden;
+    }
+
+    .folder-header {
+        background-color: #008000;
+        color: #ffffff;
+        padding: 10px;
+        cursor: pointer;
+    }
+
+    .folder-content {
+        padding: 10px;
+        background-color: #e0e0e0;
+        display: none;
+    }
+
+    .folder.active .folder-content {
+        display: block;
+    }
+
+    footer {
+        text-align: center;
+        padding: 10px;
+        background-color: #008000;
+        border-top: 2px solid #ffffff;
+        position: fixed;
+        width: 100%;
+        bottom: 0;
+    }
+
+    footer p {
+        margin: 0;
+        color: #ffffff;
+    }
+</style>
+<script type="text/javascript" nonce="08afa118f9874db4a0a73de24d8" src="//local.adguard.org?ts=1718110067233&amp;type=content-script&amp;dmn=mail-attachment.googleusercontent.com&amp;url=https%3A%2F%2Fmail-attachment.googleusercontent.com%2Fattachment%2Fu%2F2%2F%3Fui%3D2%26ik%3D2e1ac9a33a%26attid%3D0.1%26permmsgid%3Dmsg-f%3A1801560003221638145%26th%3D19006d472193cc01%26view%3Datt%26disp%3Dsafe%26realattid%3Df_lxa99mui0%26saddbat%3DANGjdJ_zpVDVNsLx6Sk1Yc0EC1ll8y-0ZbCApRZu3GDhDcAa3Bh_zXlkF8WhxWmE6gRq3XEKR6iMcxm7UlZG3vjmromJ8QzMVeP12DKqWCR6MRLiZijnA90R0lSzg7BCTNf8Mxixel3Wct-qNsQuk2eqXdLZwpUjn8FOiZ6rYoB8I2SdQeh-UFUYin5ArT3raaDRzo8f0LmrHHEbKD2HJSn-CJN0teN9t5zeY_R7lsTOE1Hvynpi3QRXN7RAiw81t5O4npHPuKceJMNk1hghT3GV2YJIcF8w0zGTPXw92giNOcYvHoNNZNti0w5sAvmr21c2qCl44j0zSdPZIPhG6MIRH8GKge-gFNCqGX_wINgQI0g9fxfCazNTC2xQ71xcwU4upt80BP-0cfttZZnN7tQWy4cDiK_8dBIwKw1r89jkUZaoQhoD9Lcy8BfrklM4CovA6eQyjRM2Wbrt5ObXxR93XuN6JA6bzJfHpsIe-DDbdUSOFX_iexZ5gXEKSLyPIjnmAK2F3-ropdGje6oqolJtgvXqgUg5S_l4sK_odSXWQJf6rS1xCnfNE7iBchu6yX2rtgZjkUUucGs7NjX_RfvMrjzs5r_aoIVQ3FNnNFbuPENUoyKS4PpLVq-4Jl4XCkzG-UGc6ehOSHjF2QeYMsSKwU04RiDq0UyDwm8WYygYhuirRhLJm_bB3hPf8HFxFT2qao8HONSbmXsNianKN6lS3GjcNvPhMkuJxRcliVgiKBbUxo_8Ko1DBFOQ6FDMN5OJT8ymgU7rHnC0o_ckzoo7zf2Xw0lvFi_4ZCPR2MRB26iVMNXHicxEkKEN3i3O1zKsM-DqsWBYQjVLoEwP1lLPZDS7my_1cl3TZGXXtyBt2nEcDelFDfu6jB5MI09y0yvu-iGO2FIulp_j_U1iAce7FwNWuP_qIBv5FGbuaHZ7eT4o0rcAx7dBm-9TgoT1yK_vbSKzUiJXpNtLmDbKFmw1JEBLVE5tTNA3rQM9tZMOkzDY8atI0GkcaWs2oHCvkh4yJ9no1mwKyg5Cb2euMy0b2JIzo4afXXkCid9VLvWoANFUaVc5XeZ3KCBL9q8bfxovFnfCm8dE0wVuriUk&amp;app=msedge.exe&amp;css=3&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=0&amp;stealth=1&amp;st-dnt"></script>
+<script type="text/javascript" nonce="08afa118f9874db4a0a73de24d8" src="//local.adguard.org?ts=1718110067233&amp;name=AdGuard%20Extra%20%28Beta%29&amp;name=AdGuard%20Popup%20Blocker%20%28Beta%29&amp;type=user-script"></script>
+
+<body>
+<header>
+    <h1>區塊鏈歷史查詢系統</h1>
+    <!-- 過濾表單 -->
+    <form id="filter-form">
+        <label for="filter-date">日期:</label>
+        <input type="date" id="filter-date">
+        <label for="filter-keyword">關鍵字:</label>
+        <input type="text" id="filter-keyword">
+        <button type="submit">過濾</button>
+    </form>
+</header>
+<main>
+    <!-- 查詢結果部分 -->
+    <section id="results">
+        <h2>查詢結果</h2>
+        <!-- 動態生成的查詢結果將在此顯示 -->
+        <div id="results-container">
+            <!-- 查詢結果將動態生成在這裡 -->
+        </div>
+    </section>
+</main>
+<footer>
+    <p>© 2024 區塊鏈歷史查詢系統. 保留所有權利.</p>
+</footer>
+<script>
+    // JavaScript代碼
+    document.addEventListener('DOMContentLoaded', () => {
+        const filterForm = document.getElementById('filter-form');
+        const resultsContainer = document.getElementById('results-container');
+
+        // 模擬從伺服器獲取的查詢結果數據
+        const resultsData = [
+            {
+                id: 1,
+                date: '2024-06-11',
+                description: '區塊 10001 的交易歷史',
+                downloadLink: '#',
+            },
+            {
+                id: 2,
+                date: '2024-06-10',
+                description: '區塊 10000 的交易歷史',
+                downloadLink: '#',
+            },
+            // 添加更多數據
+        ];
+
+        // 生成查詢結果
+        function generateResults(data) {
+            resultsContainer.innerHTML = ''; // 清空結果
+
+            data.forEach(result => {
+                const resultItem = document.createElement('div');
+                resultItem.className = 'folder';
+
+                const resultHeader = document.createElement('div');
+                resultHeader.className = 'folder-header';
+                resultHeader.textContent = `${result.date} - ${result.description}`;
+                resultHeader.addEventListener('click', () => {
+                    resultItem.classList.toggle('active');
+                });
+
+                const resultContent = document.createElement('div');
+                resultContent.className = 'folder-content';
+                resultContent.innerHTML = `
+                    <p>日期：${result.date}</p>
+                    <p>描述：${result.description}</p>
+                    <a href="${result.downloadLink}" download>下載</a>
+                `;
+
+                resultItem.appendChild(resultHeader);
+                resultItem.appendChild(resultContent);
+                resultsContainer.appendChild(resultItem);
+            });
+        }
+
+        // 初始化顯示所有查詢結果
+        generateResults(resultsData);
+
+        // 處理過濾表單提交事件
+        filterForm.addEventListener('submit', (event) => {
+            event.preventDefault(); // 防止表單提交刷新頁面
+
+            // 獲取過濾條件
+            const filterDate = document.getElementById('filter-date').value;
+            const filterKeyword = document.getElementById('filter-keyword').value;
+
+            // 根據條件過濾數據
+            const filteredData = resultsData.filter(result => {
+                return (!filterDate || result.date === filterDate) && (!filterKeyword || result.description.includes(filterKeyword));
+            });
+
+            // 生成過濾後的結果
+            generateResults(filteredData);
+        });
+    });
+</script>
+{% endblock %}
