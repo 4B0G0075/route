@@ -75,7 +75,7 @@ tr:hover {
     </div>
 
     <div class="content2">
-        <table id="packets-table">
+        <table id="packet-table">
             <thead>
                 <tr>
                     <th>來源 IP</th>
@@ -94,9 +94,9 @@ tr:hover {
 
     <script>
         async function fetchData() {
-            const response = await fetch('/history_analysis/data');
+            const response = await fetch('/history_analysis/packet_data');
             const data = await response.json();
-            const tableBody = document.querySelector('#packets-table tbody');
+            const tableBody = document.querySelector('#packet-table tbody');
             tableBody.innerHTML = ''; // 清空表格
             data.forEach(packet => {
                 const row = document.createElement('tr');

@@ -6,97 +6,95 @@ dashboard
 
 {% block content %}
 <div class="container mt-4">
-    <!-- Canvas 用來展示折線圖 -->
+    <h2>實時網路流量 (Kbps)</h2>
     <canvas id="myChart" width="800" height="400"></canvas>
-
-    <!-- 按鈕來啟動攻擊和停止攻擊 -->
-    <div class="mt-3">
-        <button class="btn btn-primary me-2" onclick="startAttack()">開始攻擊</button>
-        <button class="btn btn-danger" onclick="stopAttack()">停止攻擊</button>
-    </div>
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const ctx = document.getElementById('myChart').getContext('2d');
-        let attackIntervalId = null;  // 將 attackIntervalId 定義在全局作用域中
-    
-        // 初始數據和配置
-        const initialData = {
-            datasets: [{
-                label: 'Attack Traffic',
-                data: [],
-                fill: false,
-                borderColor: 'rgb(255, 99, 132)',
-                tension: 0.1
-            }]
-        };
-    
-        const config = {
-            type: 'line',
-            data: initialData,
-            options: {
-                plugins: {
-                    streaming: {
-                        duration: 20000,
-                        refresh: 1000,
-                        delay: 1000,
-                        frameRate: 30,
-                        onRefresh: function(chart) {
-                            const now = Date.now();
-                            const newDataPoint = now % 3000 < 1000 ? Math.random() * 100 : 0;
-                            chart.data.datasets[0].data.push({ x: now, y: newDataPoint });
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        type: 'realtime',
-                        realtime: {
-                            onRefresh: function(chart) {
-                                // 不需要做任何事情，因為數據是在 streaming 插件的 onRefresh 中添加的
-                            }
+document.addEventListener('DOMContentLoaded', function () {
+    // 自動呼叫啟動封包捕獲的 API
+    fetch('/start_capture')
+        .then(response => response.text())
+        .then(data => console.log(data))
+        .catch(error => console.error('Error starting capture:', error));
+
+    const ctx = document.getElementById('myChart').getContext('2d');
+
+    // 設置 Chart.js 的初始資料
+    const initialData = {
+        datasets: [{
+            label: '實時流量 (Kbps)',
+            data: [],
+            fill: false,
+            borderColor: 'rgb(255, 99, 132)',
+            tension: 0.1
+        }]
+    };
+
+    const config = {
+        type: 'line',
+        data: initialData,
+        options: {
+            scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        unit: 'second',
+                        tooltipFormat: 'YYYY-MM-DD HH:mm:ss',
+                        displayFormats: {
+                            second: 'HH:mm:ss',
                         }
                     },
-                    y: {
-                        beginAtZero: true
+                    title: {
+                        display: true,
+                        text: '時間'
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: '流量 (Kbps)'
                     }
                 }
-            }
-        };
-    
-        const myChart = new Chart(ctx, config);
-    
-        // 函數每秒發送一次攻擊數據，每10秒發送一次大量攻擊數據
-        function sendAttackData() {
-            attackIntervalId = setInterval(function() {
-                const now = Date.now();
-                let attackTraffic = Math.random() * 50 + 50;
-    
-                // 每10秒發送一次大量攻擊數據
-                if (now % 10000 < 1000) {
-                    attackTraffic = Math.random() * 500 + 500;
+            },
+            plugins: {
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
                 }
-    
-                myChart.data.datasets[0].data.push({ x: now, y: attackTraffic });
-                myChart.update(); // 更新圖表
-            }, 1000);
+            }
         }
-    
-        // 開始攻擊
-        window.startAttack = function() {
-            if (!attackIntervalId) {
-                sendAttackData();
-            }
-        };
-    
-        // 停止攻擊
-        window.stopAttack = function() {
-            if (attackIntervalId) {
-                clearInterval(attackIntervalId);
-                attackIntervalId = null;
-            }
-        };
-    });
-    </script>
+    };
+
+    const chart = new Chart(ctx, config);
+
+    function fetchPacketData() {
+        fetch('/dashboard/data')
+            .then(response => response.json())
+            .then(data => {
+                const now = Date.now();
+                const latestTraffic = data.length > 0 ? data[data.length - 1] : 0;
+
+                // 添加數據點
+                chart.data.datasets[0].data.push({
+                    x: now,
+                    y: latestTraffic
+                });
+
+                // 移除舊的數據以保持圖表在一定時間內的數據量
+                if (chart.data.datasets[0].data.length > 60) {
+                    chart.data.datasets[0].data.shift();
+                }
+
+                // 更新圖表
+                chart.update('none');
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    }
+
+    // 設置每秒更新一次數據
+    setInterval(fetchPacketData, 1000);
+});
+</script>
 {% endblock %}

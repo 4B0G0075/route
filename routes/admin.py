@@ -3,7 +3,7 @@ from flask import jsonify, render_template, request, redirect, flash
 from werkzeug.utils import secure_filename
 from . import app
 from csv_prediction import allowed_file, convert_pcap_to_csv, predict_csv
-from capture import packets_data, capture_packets
+from capture import packet_data, capture_packets, traffic_data
 import threading
 
 
@@ -11,6 +11,16 @@ import threading
 @app.route('/dashboard')
 def dashboard():
     return render_template('dashboard.html')
+
+@app.route('/start_capture')
+def start_capture():
+    """啟動封包捕獲的路由"""
+    threading.Thread(target=capture_packets, daemon=True).start()
+    return "Packet capture started"
+
+@app.route('/dashboard/data')
+def get_traffic_data():
+    return jsonify(traffic_data)
 
 @app.route('/blockchain_explorer')
 def blockchain_explorer():
@@ -26,14 +36,12 @@ def filter_search():
 
 @app.route('/history_analysis')
 def history_analysis():
-    capture_thread = threading.Thread(target=capture_packets, daemon=True)
-    capture_thread.start()
     return render_template('history_analysis.html')
 
-@app.route('/history_analysis/data')
-def data():
-    return jsonify(packets_data)
-
+@app.route('/history_analysis/packet_data')
+def get_packet_data():
+    """提供封包數據給前端"""
+    return jsonify(packet_data)
 
 @app.route('/csv_prediction', methods=['GET', 'POST'])
 def csv_prediction():
