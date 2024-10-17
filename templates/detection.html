@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}
+detection page
+{% endblock %}
+
+{% block content %}
+<style>
+    /*攻擊偵測與警報 (detection.html)
+功能描述: 展示攻擊者與防禦者的MAC地址和IP，偵測DOS攻擊並發送警報，包括攻擊詳情和建議。這個頁面專注於安全威脅的偵測和響應，幫助用戶快速了解和處理安全事件。*/
+</style>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4">攻擊偵測與警報</h1>
+        <form id="bssidForm">
+            <div class="form-group">
+                <label for="bssidInput">AP的BSSID:</label>
+                <input type="text" class="form-control" id="bssidInput" name="bssid" required>
+                <div class="invalid-feedback">請輸入有效的BSSID。</div>
+            </div>
+            <div class="form-group">
+                <label for="emailInput">您的Email:</label>
+                <input type="email" class="form-control" id="emailInput" name="email" required>
+                <div class="invalid-feedback">請輸入有效的Email地址。</div>
+            </div>
+            <div class="form-group">
+                <label for="passwordInput">您的密碼:</label>
+                <input type="password" class="form-control" id="passwordInput" name="password" required>
+                <div class="invalid-feedback">請輸入密碼。</div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">開始偵測</button>
+        </form>
+        <div class="alert alert-danger" id="alert" role="alert">
+            <strong>警報！</strong> 發現 DOS 攻擊。
+        </div>
+        <table class="table mt-4">
+            <thead>
+                <tr>
+                    <th>時間</th>
+                    <th>來源MAC地址</th>
+                    <th>DDoS攻擊</th>
+                </tr>
+            </thead>
+            <tbody id="details">
+                <!-- 攻擊者與防禦者的資料將動態填充 -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            $('#bssidForm').submit(function (event) {
+                event.preventDefault();
+                if (this.checkValidity() === false) {
+                    event.stopPropagation();
+                } else {
+                    var formData = $(this).serialize();
+                    $.post('/start', formData, function (data) {
+                        if (data.error) {
+                            alert(data.error);
+                        } else {
+                            alert('開始捕獲數據包');
+                            startFetchingData();
+                        }
+                    }, 'json');
+                }
+                $(this).addClass('was-validated');
+            });
+
+            function startFetchingData() {
+                // 定時從後端獲取數據並更新頁面
+                function fetchData() {
+                    $.getJSON('/results', function (data) {
+                        var detailsTable = $('#details');
+                        detailsTable.empty();  // 清空現有數據
+                        var alertDisplayed = false;
+
+                        $.each(data, function (index, item) {
+                            var row = $('<tr>');
+                            row.append($('<td>').text(item.time));
+                            row.append($('<td>').text(item.source_mac));
+                            row.append($('<td>').text(item.is_ddos));
+                            detailsTable.append(row);
+
+                            if (item.is_ddos === '是') {
+                                alertDisplayed = true;
+                            }
+                        });
+
+                        if (alertDisplayed) {
+                            $('#alert').show();
+                            showNotification("發現 DOS 攻擊！");
+                        } else {
+                            $('#alert').hide();
+                        }
+                    });
+                }
+
+                // 每5秒更新一次數據
+                setInterval(fetchData, 5000);
+
+                // 初次加載數據
+                fetchData();
+            }
+
+            // 顯示通知
+            function showNotification(message) {
+                if (Notification.permission === "granted") {
+                    new Notification(message);
+                } else if (Notification.permission !== "denied") {
+                    Notification.requestPermission().then(permission => {
+                        if (permission === "granted") {
+                            new Notification(message);
+                        }
+                    });
+                }
+            }
+
+            // 請求通知權限
+            if (Notification.permission !== "granted") {
+                Notification.requestPermission();
+            }
+        });
+    </script>
+</body>
+
+
+
+
+{% endblock %}

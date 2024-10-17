@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block title %}
+history_analysis page
+{% endblock %}
+
+{% block content %}
+101112
+
+<style>
+/*歷史數據分析 (history_analysis.html)
+功能描述: 展示歷史網路流量和攻擊情況，結合機器學習模型進行數據分析和預測。允許用戶回顧過去的數據，並利用數據分析預測未來趨勢。*/
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #e8f5e9;
+    margin: 0;
+    padding: 20px;
+    color: #333;
+}
+
+.content {
+    position: fixed;
+    width: 100%;
+    background-color: #ffffff;
+    padding: 15px 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.content h1 {
+    display: inline;
+    margin-right: 20px;
+    font-size: 24px;
+    color: #4CAF50;
+}
+
+.content button {
+    padding: 10px 20px;
+    margin-right: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+#start-button {
+    background-color: #4CAF50;
+    color: white;
+}
+
+#start-button:hover {
+    background-color: #45a049;
+}
+
+#stop-button {
+    background-color: #f44336;
+    color: white;
+}
+
+#stop-button:hover {
+    background-color: #e53935;
+}
+
+.content2 {
+    margin-top: 120px; /* 避免內容被固定標頭遮擋 */
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    font-size: 16px;
+}
+
+th {
+    background-color: #4CAF50;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+tr:hover {
+    background-color: #d1f5d3;
+}
+</style>
+
+<body>
+    <div class="content">
+        <h1>封包資料</h1>
+        <button id="start-button">開始捕獲</button>
+        <button id="stop-button">停止捕獲</button>
+    </div>
+
+    <div class="content2">
+        <table id="packets-table">
+            <thead>
+                <tr>
+                    <th>來源 IP</th>
+                    <th>目的 IP</th>
+                    <th>協議</th>
+                    <th>長度</th>
+                    <th>來源端口</th>
+                    <th>目的端口</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 資料將在這裡填充 -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        async function fetchData() {
+            const response = await fetch('/history_analysis/data');
+            const data = await response.json();
+            const tableBody = document.querySelector('#packets-table tbody');
+            tableBody.innerHTML = ''; // 清空表格
+            data.forEach(packet => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${packet.src_ip}</td>
+                    <td>${packet.dst_ip}</td>
+                    <td>${packet.protocol}</td>
+                    <td>${packet.length}</td>
+                    <td>${packet.src_port}</td>
+                    <td>${packet.dst_port}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        async function startCapture() {
+            const response = await fetch('/history_analysis/start');
+            const message = await response.text();
+            console.log(message);
+        }
+
+        async function stopCapture() {
+            const response = await fetch('/history_analysis/stop');
+            const message = await response.text();
+            console.log(message);
+        }
+
+        document.getElementById('start-button').addEventListener('click', startCapture);
+        document.getElementById('stop-button').addEventListener('click', stopCapture);
+
+        setInterval(fetchData, 2000); // 每2秒刷新一次資料
+        fetchData(); // 頁面載入時先取一次資料
+    </script>
+</body>
+
+{% endblock %}

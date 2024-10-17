@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% block title %}
+csv_prediction page
+{% endblock %}
+
+
+    
+{% block content %}
+<style>
+/*CSV檔案預測
+功能描述: 利用CSV檔案進行數據分析和預測，以支持更精確的決策制定。
+使用的技術:
+隨機森林 (Random Forest)
+KNN (K-Nearest Neighbors)
+CSV*/
+/* CSS 樣式 */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+    }
+    header {
+        background-color: #5f6b5f;
+        color: white;
+        text-align: center;
+        padding: 1em 0;
+    }
+    main {
+        max-width: 800px;
+        margin: 2em auto;
+        padding: 2em;
+        background-color: white;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+    }
+    h1, h2 {
+        color: #333;
+    }
+    p {
+        color: #666;
+    }
+    form {
+        margin-top: 2em;
+    }
+    label {
+        display: block;
+        margin-bottom: 0.5em;
+        color: #333;
+    }
+    input[type="file"] {
+        display: block;
+        margin-bottom: 1em;
+    }
+    table {
+        width: 100%;
+        margin-top: 2em;
+        border-collapse: collapse;
+    }
+    th, td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        text-align: center;
+    }
+    th {
+        background-color: #4CAF50;
+        color: white;
+    }
+    tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+    .best {
+        font-weight: bold;
+        color: #d32f2f;
+    }
+    .progress-container {
+        margin-top: 1em;
+    }
+    .progress-bar {
+        width: 0;
+        height: 20px;
+        background-color: #4CAF50;
+    }
+</style>
+<script>
+    // JavaScript 函數，用於檢查表單提交前是否選擇了檔案
+    function validateForm() {
+        var fileInput = document.getElementById('file');
+        if (fileInput.files.length === 0) {
+            alert('請先上傳檔案！');
+            return false;
+        }
+        return true;
+    }
+    // JavaScript 函數，用於顯示進度條
+    function showProgress() {
+        document.querySelectorAll(".progress-container").forEach(function(container) {
+            container.style.display = "block";
+        });
+        document.getElementById("message").innerText = "正在處理中...";
+    }
+</script>
+
+<header>
+    <h1>數據分析與預測</h1>
+</header>
+<main>
+    <section>
+        <!-- 上傳檔案表單 -->
+        <h2>上傳檔案進行預測</h2>
+        <p>上傳 CSV 或 PCAP 檔案進行預測：</p>
+        <form action="/csv_prediction" method="post" enctype="multipart/form-data" onsubmit="return validateForm() && showProgress()">
+            <label for="file">選擇一個檔案:</label>
+            <input type="file" id="file" name="file" accept=".csv, .pcap">
+            <small>請選擇包含您想要分析的數據的 CSV 或 PCAP 檔案。</small>
+            <!-- 進度條容器 -->
+            <div class="progress-container" style="display: none;">
+                <div class="progress-bar" style="width: 0;"></div>
+            </div>
+            <!-- 處理中消息 -->
+            <p id="message" style="display: none;">正在處理中...</p>
+            <!-- 分析與預測按鈕 -->
+            <button type="submit">分析與預測</button>
+        </form>
+    </section>
+
+    {% if results %}
+    <section>
+        <!-- 分析結果表格 -->
+        <h2>DOS 深度檢測結果</h2>
+        <table>
+            <tr>
+                <th>分類器</th>
+                <th>準確率</th>
+            </tr>
+            <tr>
+                <td>隨機森林</td>
+                <td id="rf_accuracy">{{ results.rf_accuracy }}</td>
+            </tr>
+            <tr>
+                <td>SVM</td>
+                <td id="svm_accuracy">{{ results.svm_accuracy }}</td>
+            </tr>
+            <tr>
+                <td>KNN</td>
+                <td id="knn_accuracy">{{ results.knn_accuracy }}</td>
+            </tr>
+        </table>
+        <!-- 最佳模型提示 -->
+        <h2>最佳模型是: <span class="best">{{ results.best_model_name }}</span></h2>
+    </section>
+    {% endif %}
+</main>
+{% endblock %}
