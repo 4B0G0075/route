@@ -5,7 +5,6 @@ history_analysis page
 {% endblock %}
 
 {% block content %}
-101112
 
 <style>
 /*歷史數據分析 (history_analysis.html)
@@ -20,7 +19,8 @@ body {
 }
 
 .content {
-    position: fixed;
+    position: sticky;
+    top: 0;
     width: 100%;
     background-color: #ffffff;
     padding: 15px 20px;
@@ -61,10 +61,6 @@ body {
 
 #stop-button:hover {
     background-color: #e53935;
-}
-
-.content2 {
-    margin-top: 120px; /* 避免內容被固定標頭遮擋 */
 }
 
 table {

@@ -3,7 +3,7 @@ from flask import jsonify, render_template, request, redirect, flash
 from werkzeug.utils import secure_filename
 from . import app
 from csv_prediction import allowed_file, convert_pcap_to_csv, predict_csv
-from capture import packets_data, capture_thread, capture_running, capture_packets
+from capture import packets_data, capture_thread, capture_running, capture_packets, stop_capture_thread
 import threading
 
 capture_thread = None
@@ -46,10 +46,8 @@ def start_capture():
         return "Packet capture is already running."
 
 @app.route('/history_analysis/stop')
-def stop_capture():
-    global capture_running
-    capture_running = False
-    return "Packet capture stopped."
+def stop_capture_route():
+    return stop_capture_thread()
 
 @app.route('/csv_prediction', methods=['GET', 'POST'])
 def csv_prediction():

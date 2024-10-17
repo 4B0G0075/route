@@ -35,6 +35,7 @@ def capture_packets():
     capture = pyshark.LiveCapture(interface=interface, display_filter='http')
     
     global packets_data, capture_running
+    capture_running = True
     for packet in capture.sniff_continuously():
         if not capture_running:
             break
@@ -51,3 +52,11 @@ def capture_packets():
         if len(packets_data) > 100:  # 限制存儲的封包數量
             packets_data.pop(0)
 
+def stop_capture_thread():
+    global capture_running
+    if capture_running:
+        capture_running = False
+        print("Stopping packet capture...")
+        return "Packet capture is stopping."
+    else:
+        return "No capture is currently running."
