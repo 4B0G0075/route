@@ -5,8 +5,7 @@ from routes import app
 
 # 全域變數儲存封包數據
 packets_data = []
-capture_thread = None
-capture_running = False
+
 
 def extract_packet_info(packet):
     src_ip = dst_ip = protocol = src_port = dst_port = length = 'N/A'
@@ -51,12 +50,3 @@ def capture_packets():
         packets_data.append(packet_info)
         if len(packets_data) > 100:  # 限制存儲的封包數量
             packets_data.pop(0)
-
-def stop_capture_thread():
-    global capture_running
-    if capture_running:
-        capture_running = False
-        print("Stopping packet capture...")
-        return "Packet capture is stopping."
-    else:
-        return "No capture is currently running."
