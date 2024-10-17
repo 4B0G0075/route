@@ -1,24 +1,24 @@
-# 忽略 Python 的编译文件
+# 忽略 Python 的編譯文件
 *.pyc
 __pycache__/
 
-# 忽略环境配置文件
+# 忽略環境配置文件
 .env
 *.env
 
-# 忽略IDE/编辑器配置文件
+# 忽略 IDE/編輯器配置文件
 .vscode/
 .idea/
 
-# 忽略操作系统生成的文件
+# 忽略操作系統生成的文件
 .DS_Store
 Thumbs.db
 
-# 忽略日志文件
+# 忽略日誌文件
 *.log
 
-# 忽略node_modules（如果使用Node.js）
+# 忽略 node_modules（如果使用 Node.js）
 node_modules/
 
-# 忽略上传的文件夹（例如你提到的uploads）
+# 忽略上傳的資料夾（例如你提到的 uploads）
 uploads/
