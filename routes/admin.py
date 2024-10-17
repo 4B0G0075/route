@@ -6,8 +6,6 @@ from csv_prediction import allowed_file, convert_pcap_to_csv, predict_csv
 from capture import packets_data, capture_thread, capture_running, capture_packets, stop_capture_thread
 import threading
 
-capture_thread = None
-capture_running = False
 
 @app.route('/')
 @app.route('/dashboard')
